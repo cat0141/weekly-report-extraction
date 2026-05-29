@@ -1,0 +1,84 @@
+{
+  "_说明": "周报提取 Skill 集中配置文件。所有可变信息集中管理，修改后无需改动 SKILL.md。",
+  "_版本": "4.1",
+  "_更新": "2026-05-29",
+
+  "mcp": {
+    "key": "请替换为真实的钉钉日志 MCP key",
+    "_说明": "key 保存于此，避免在 config.yaml 中被截断显示为 ***。如调用返回 PARAM_ERROR，首先检查此 key 是否正确。"
+  },
+
+  "team_members": [
+    {
+      "name": "徐航",
+      "department": "小微营销组",
+      "focus": "前端营收、新签单量、线索转化情况",
+      "dingtalk_user_id": "请替换为真实 userId",
+      "report_template": "总部客成中心周报",
+      "report_id": "19e2fce8d3a22e15c9f74cf4d26b1080",
+      "enabled": true
+    },
+    {
+      "name": "葛玉",
+      "department": "投流组",
+      "focus": "投流花费、线索量、有效线索量、ROI",
+      "dingtalk_user_id": "请替换为真实 userId",
+      "report_template": "葛玉的周报模板",
+      "report_id": "19e308fee06030f704304e042d7a0f70",
+      "enabled": true
+    },
+    {
+      "name": "王顺泽",
+      "department": "产品部",
+      "focus": "产品需求、迭代进度、一线反馈",
+      "dingtalk_user_id": "448599304661409792",
+      "report_template": "产品部周报",
+      "enabled": true
+    },
+    {
+      "name": "汪玉瑶",
+      "department": "运营组",
+      "focus": "收款数据、运营活动、客户维护",
+      "dingtalk_user_id": "364863546608361472",
+      "report_template": "中小微事业群-小微团队汇总周报",
+      "enabled": true
+    }
+  ],
+
+  "paths": {
+    "_说明": "以下路径为部署环境路径，本地开发时请根据实际情况调整。",
+    "base_dir": "/root/workspace-openclaw/workspace/周报与复盘",
+    "raw_reports_dir": "/root/workspace-openclaw/workspace/周报与复盘/原始周报",
+    "summary_dir": "/root/workspace-openclaw/workspace/周报与复盘/业务汇总",
+    "diff_rules_file": "/root/workspace-openclaw/项目管理/易云簿和财云差异化说明.md",
+    "nginx_static_dir": "/var/www/yiyunbu-crm/pages",
+    "nginx_base_url": "http://120.26.127.160/crm/pages"
+  },
+
+  "templates": {
+    "weekly_report": "references/weekly-report-template.html",
+    "summary": "references/summary-template.html",
+    "comparison": "references/comparison-template.html",
+    "director_view": "references/director-view-template.html"
+  },
+
+  "schemas": {
+    "weekly_report_data": "references/weekly-report-data-schema.json",
+    "summary_data": "references/summary-data-schema.json"
+  },
+
+  "product_lines": {
+    "yiyunbu": {
+      "name": "易云簿",
+      "target_customers": ["终端企业客户"],
+      "keywords": [],
+      "exclude_keywords": ["AI会计师", "专业版", "代账公司", "财务机构"]
+    },
+    "caiyun": {
+      "name": "财云",
+      "target_customers": ["代账公司", "财务机构"],
+      "keywords": ["AI会计师", "专业版"],
+      "exclude_keywords": []
+    }
+  }
+}

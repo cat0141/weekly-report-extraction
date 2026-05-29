@@ -1,0 +1,23 @@
+{
+  "_说明": "原始周报 JSON 数据填充 Schema。渲染时根据此结构填充 weekly-report-template.html 的占位符。",
+  "name": "人员姓名",
+  "date": "2026-05-18",
+  "department": "所属部门",
+  "sections": [
+    {
+      "title": "本周工作内容",
+      "content": "<p>工作内容 HTML 片段</p>"
+    },
+    {
+      "title": "下周计划",
+      "content": "<p>计划内容 HTML 片段</p>"
+    },
+    {
+      "title": "遇到的困难",
+      "content": "<p>困难描述 HTML 片段</p>"
+    }
+  ],
+  "_字段说明": {
+    "sections": "contentV2 中的每个条目转换为一个 section。key → title，转换后的 HTML → content。"
+  }
+}

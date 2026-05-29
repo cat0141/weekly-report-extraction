@@ -1,0 +1,58 @@
+{
+  "_说明": "业务汇总 JSON 数据填充 Schema。渲染时根据此结构填充 summary-template.html 的占位符。",
+  "product_line": "易云簿",
+  "date": "2026-05-18",
+  "date_range": "2026-05-12 ~ 2026-05-18",
+  "header_gradient_start": "#1677ff",
+  "header_gradient_end": "#0958d9",
+  "accent_color": "#1677ff",
+  "kpi_cards": [
+    {
+      "label": "新签单量",
+      "value": "3",
+      "note": "易云簿 2 + 财云 1"
+    },
+    {
+      "label": "本周回款",
+      "value": "2.8万",
+      "note": "目标 3.0万"
+    },
+    {
+      "label": "有效线索",
+      "value": "15",
+      "note": "转化率 8%"
+    }
+  ],
+  "sections": [
+    {
+      "title": "💰 业绩",
+      "content": "<ul><li>徐航：新签 3 单（2 易云簿 + 1 财云），回款 2.8 万</li></ul>"
+    },
+    {
+      "title": "📈 投流与线索数据",
+      "content": "<p>有效线索目标：20，完成 75%</p>"
+    },
+    {
+      "title": "💡 产品需求（一线反馈）",
+      "content": "<ul><li>需求1</li><li>需求2</li></ul>"
+    },
+    {
+      "title": "📋 运营",
+      "content": "<ul><li>运营事项1</li></ul>"
+    },
+    {
+      "title": "🧠 关键思考",
+      "content": "<p>思考内容</p>"
+    },
+    {
+      "title": "📅 下周计划",
+      "content": "<ul><li>徐航：跟进XX客户</li></ul>"
+    }
+  ],
+  "_字段说明": {
+    "header_gradient_start/end": "产品线主题色。易云簿用蓝色系 (#1677ff)，财云用绿色系 (#52c41a)",
+    "accent_color": "用于标题边框、KPI 数值等强调色",
+    "kpi_cards": "指标卡片数组，按需增减",
+    "sections": "按「汇总输出格式」的顺序组织，content 为 HTML 片段"
+  }
+}
