@@ -4,8 +4,29 @@
   "_更新": "2026-05-29",
 
   "mcp": {
-    "key": "请替换为真实的钉钉日志 MCP key",
-    "_说明": "key 保存于此，避免在 config.yaml 中被截断显示为 ***。如调用返回 PARAM_ERROR，首先检查此 key 是否正确。"
+    "server_id": "7e6ce70465b4b041880e47a5160e338454c8b43f9284ca6f8a2e44ccf130d433",
+    "key": "4d2866b973935a2d0bf5b2eb6a47a495",
+    "url": "https://mcp-gw.dingtalk.com/server/7e6ce70465b4b041880e47a5160e338454c8b43f9284ca6f8a2e44ccf130d433",
+    "_说明": "钉钉日志 MCP 网关配置。key 保存于此避免在 config.yaml 中被截断显示为 ***。获取方式：钉钉开放平台 → 应用 → MCP 服务 → 复制完整 URL。",
+    "_排错": "如调用返回 PARAM_ERROR 或 not found the specified tool，检查 key 是否完整（曾被截断问题，2026-04-28 修复）。"
+  },
+
+  "mcp_other_endpoints": {
+    "_说明": "其他钉钉 MCP 端点，供参考。skill 主流程仅使用钉钉日志 MCP。",
+    "钉钉文档": {
+      "server_id": "149d488551a087438fa75a336508168f98de933a36ad0f2227c9d4b443c51b00",
+      "key": "49b2bf423ac95461486be98d3fccb8ae",
+      "config_file": "~/.hermes/skills/openclaw-imports/dingtalk-docs-config/config.json"
+    },
+    "钉钉AI表格": {
+      "server_id": "d1e7d5966a5b4d111f330b03820a2ea8056bb2930fce73df626d3be66542cba4",
+      "key": "d262faa30a8e580646421b1e149da191",
+      "config_file": "~/.hermes/skills/openclaw-imports/dingtalk-ai-table-config/config.json"
+    },
+    "钉钉表格": {
+      "server_id": "a76dec01ef4fe4e573375090a22ab01761cbb6c4113a72bc914a623c37b119b8",
+      "key": "4fcba96dfd5c50c53b4a6e164f0189cc"
+    }
   },
 
   "team_members": [

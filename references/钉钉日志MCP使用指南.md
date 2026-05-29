@@ -168,3 +168,45 @@ const start = new Date('2026-05-12').getTime();  // → 1776000000000
 // 毫秒时间戳 → 日期
 const date = new Date(1776000000000);  // → Mon May 12 2026
 ```
+
+---
+
+## 6. MCP 连接配置
+
+### 钉钉日志 MCP
+
+```
+Server ID: 7e6ce70465b4b041880e47a5160e338454c8b43f9284ca6f8a2e44ccf130d433
+Key:      4d2866b973935a2d0bf5b2eb6a47a495
+URL:      https://mcp-gw.dingtalk.com/server/7e6ce70465b4b041880e47a5160e338454c8b43f9284ca6f8a2e44ccf130d433
+```
+
+配置文件路径（LightClaw 服务器）：`~/.hermes/skills/openclaw-imports/` 对应子目录下的 `config.json`
+
+### 获取 MCP URL 方法
+
+1. 访问钉钉开放平台 (open.dingtalk.com)
+2. 进入应用 → MCP 服务
+3. 复制完整 URL（含 key 参数）
+
+---
+
+## 7. 排错记录
+
+### API Key 截断问题（2026-04-28）
+
+- **症状**：MCP 工具调用返回 `PARAM_ERROR` 或 `not found the specified tool`
+- **根因**：配置文件中的 `mcp.url` 以 `key=***` 结尾，Key 被截断
+- **修复**：重新从钉钉开放平台获取完整 MCP URL，写入配置文件。skill 中 key 保存在 `references/config.json` 的 `mcp.key` 字段，避免被 config.yaml 截断。
+
+### mcporter --args JSON 转义 Bug
+
+- mcporter CLI 的 `--args` 参数存在双层转义问题
+- **推荐**：直接用 `curl` 调用 MCP 工具代替 mcporter
+
+### PARAM_ERROR 排查步骤
+
+1. 首先检查 `references/config.json` → `mcp.key` 是否完整
+2. 检查 startTime/endTime/size/cursor 四个参数是否全部传入
+3. 确认 size ≤ 10
+4. 确认时间戳是毫秒级（不是秒级）
