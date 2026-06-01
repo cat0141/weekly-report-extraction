@@ -2,9 +2,9 @@
 name: weekly-report-extraction
 description: 从钉钉日志抓取指定人员周报、保存本地、提取产品线信息并生成汇总文档。当用户要求抓取周报、提取周报信息、汇总周报、对比周报、或用运营总监视角分析周报时使用此skill。
 agent_created: true
-version: v4.1
+version: v4.2
 created: 2026-05-03
-updated: 2026-05-29
+updated: 2026-06-01
 ---
 
 # weekly-report-extraction — 周报全流程处理
@@ -28,7 +28,7 @@ updated: 2026-05-29
 |------|------|
 | `SKILL.md` | 主流程控制（本文件） |
 | `README.md` | 简要说明与使用入口 |
-| `references/config.json` | 集中配置：人员/路径/MCP key/模板/产品线 |
+| `references/config.json` | 集中配置：人员/路径/MCP key/模板/产品线/环境 |
 | `references/钉钉日志MCP使用指南.md` | 7 个 MCP 工具的参数、示例、错误码、踩坑记录 |
 | `references/易云簿-财云差异化说明.md` | 产品线区分规则（提取前必读） |
 | `references/周报升级规范-v1.1.md` | 大王要求的升级规范：模板结构、核心原则 |
@@ -47,16 +47,38 @@ updated: 2026-05-29
 | 依赖 | 说明 |
 |------|------|
 | **钉钉日志 MCP** | 提供 `get_received_report_list`、`get_report_entry_details` 等 7 个工具 |
-| **tencent-server-ops** (可选) | 部署 HTML 到 Nginx 静态目录时使用 |
+| **tencent-server-ops** (server 模式可选) | SSH 到服务器部署 HTML 到 Nginx |
 
 ---
 
 ## 核心原则
 
-1. **配置文件驱动**：所有可变信息（人员、路径、模板）从 `references/config.json` 读取，不硬编码。
-2. **流程与细节分离**：SKILL.md 管流程，`references/` 管细节。分析提示词、模板规范放 references，用到时加载。
-3. **先查再归类**：第二阶段提取前必须先读 `references/易云簿-财云差异化说明.md`。
-4. **不确定就标注**：产品线归属不确定时标注"待确认"，不猜测。
+1. **配置文件驱动**：所有可变信息（人员、路径、模板、环境）从 `references/config.json` 读取，不硬编码。
+2. **环境自动适配**：本地电脑写本地文件夹，服务器上跑写服务器路径。由 `env.mode` 控制。
+3. **流程与细节分离**：SKILL.md 管流程，`references/` 管细节。
+4. **先查再归类**：第二阶段提取前必须先读 `references/易云簿-财云差异化说明.md`。
+5. **不确定就标注**：产品线归属不确定时标注"待确认"，不猜测。
+
+---
+
+## 第0步：环境判断
+
+**读取 `references/config.json` 中的 `env.mode` 值：**
+
+| mode | 说明 | 使用路径配置 |
+|------|------|-------------|
+| `local` | 本地电脑运行 | `paths_local` |
+| `server` | 阿里云服务器运行 | `paths_server` |
+
+**路径选择规则：**
+```
+if env.mode == "local":
+    paths = config["paths_local"]       # D:/BaiduSyncdisk/workspace/...
+else if env.mode == "server":
+    paths = config["paths_server"]      # /root/workspace-openclaw/...
+```
+
+> **首次运行前**：确认 `config.json` 中 `env.mode` 值与当前运行环境一致。默认 `local`。
 
 ---
 
@@ -66,13 +88,15 @@ updated: 2026-05-29
 
 ### Step 1：读取配置并搜索周报
 
-1. **读取 `references/config.json`**：获取 `mcp.key`、`team_members` 列表、`paths` 配置。
+1. **读取 `references/config.json`**：
+   - 根据 `env.mode` 选择 `paths_local` 或 `paths_server` 作为路径配置
+   - 获取 `mcp.key`、`team_members` 列表
 2. **调用 `get_received_report_list`** 拉取收到的日志列表。
-   - ⚠️ `startTime` + `endTime` + `size` + `cursor` **四个参数缺一不可**
+   - ️ `startTime` + `endTime` + `size` + `cursor` **四个参数缺一不可**
    - ⚠️ `size` 最大只能传 **10**（传 20/100 返回 0 条）
    - ⚠️ `cursor` 从 0 开始每次 +1（不是上次返回的值）
 3. **遍历结果**按 `creator_user_name` 匹配 `config.json` 中 `enabled: true` 的人员。
-4. **时间范围搜索**：如果第一轮未找到某人员，扩大时间范围继续翻页（徐航和葛玉的周报即使不是单独发送，只要大王能看到就能搜到）。
+4. **时间范围搜索**：如果第一轮未找到某人员，扩大时间范围继续翻页。
 
 ### Step 2：获取周报详情
 
@@ -87,7 +111,7 @@ updated: 2026-05-29
 1. **8 步 HTML 转换**（详见 `references/钉钉日志MCP使用指南.md` 第 3 节）：
    ①清 `<span>` → ②图片占位 → ③表格解析 → ④恢复图片 → ⑤标题转换 → ⑥粗体 → ⑦分割线 → ⑧分段
 2. **用 `references/weekly-report-template.html` 渲染**（模板 + JSON 数据分离，JSON Schema 见 `references/weekly-report-data-schema.json`）。
-3. **保存路径**（从 config.json 读取）：`{paths.raw_reports_dir}/人名_YYYYMMDD.html`
+3. **保存路径**（根据 env.mode 选择）：`{paths.raw_reports_dir}/人名_YYYYMMDD.html`
 
 ---
 
@@ -110,19 +134,23 @@ updated: 2026-05-29
 
 用 `references/summary-template.html` + `references/summary-data-schema.json` 生成汇总 HTML。
 
-保存路径（从 config.json 读取）：`{paths.summary_dir}/{产品线}周报汇总_{YYYYMMDD}.html`
+保存路径（根据 env.mode 选择）：`{paths.summary_dir}/{产品线}周报汇总_{YYYYMMDD}.html`
 
 输出格式见 `references/周报升级规范-v1.1.md` 的"汇总输出格式"章节。
 
-### Step 7：部署到 Nginx 静态目录
+### Step 7：部署到 Nginx 静态目录（仅 server 模式）
 
-HTML 文件**不能**通过文档系统 API 链接访问（会触发下载）。必须部署到 Nginx：
+> **local 模式跳过此步**，生成的 HTML 文件保存在本地文件夹即可。
+
+**server 模式**：HTML 文件**不能**通过文档系统 API 链接访问（会触发下载）。必须部署到 Nginx：
 
 ```bash
 cp 文件.html {paths.nginx_static_dir}/
 chown nginx:nginx {paths.nginx_static_dir}/文件.html
 # 访问链接: {paths.nginx_base_url}/文件.html
 ```
+
+如需 SSH 到服务器操作，加载 `tencent-server-ops` skill 或 `mcp-config` skill 参考 SSH 配置。
 
 ---
 
@@ -145,7 +173,7 @@ chown nginx:nginx {paths.nginx_static_dir}/文件.html
 
 ---
 
-## ⚠️ 常见陷阱速查
+## ️ 常见陷阱速查
 
 | # | 陷阱 | 详情 |
 |---|------|------|
@@ -164,8 +192,9 @@ chown nginx:nginx {paths.nginx_static_dir}/文件.html
 | 13 | 汇总文件名含日期 | 避免覆盖历史 |
 | 14 | 模板 + JSON 分离 | 样式一次定义，数据随时替换 |
 | 15 | contentV2.value 是明文 | 不是加密值 |
-| 16 | HTML 必须 Nginx 部署 | 文档 API 链接返回 octet-stream 触发下载 |
-| 17 | 时间范围搜索找人 | 扩大范围翻页 + 按 creator_user_name 过滤 |
+| 16 | env.mode 必须匹配 | local 模式用 local 路径，server 模式用 server 路径 |
+| 17 | 本地模式跳过 Nginx | local 环境无 Nginx，Step 7 直接跳过 |
+| 18 | 时间范围搜索找人 | 扩大范围翻页 + 按 creator_user_name 过滤 |
 
 ---
 
@@ -179,3 +208,4 @@ chown nginx:nginx {paths.nginx_static_dir}/文件.html
 | R4 | 提示词从 references 加载，不内联 | SKILL.md 膨胀不可维护 |
 | R5 | MCP 调用前检查 4 参数完整性 | API 返回 40035 |
 | R6 | get_received_report_list size ≤ 10 | 返回 0 条 |
+| R7 | env.mode 必须与实际运行环境一致 | 文件存到错误路径 |

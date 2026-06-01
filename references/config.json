@@ -66,8 +66,25 @@
     }
   ],
 
-  "paths": {
-    "_说明": "以下路径为部署环境路径，本地开发时请根据实际情况调整。",
+  "env": {
+    "_说明": "运行环境配置。local = 本地电脑, server = 远程服务器。skill 第一步先读取此值决定使用哪组路径。",
+    "mode": "local"
+  },
+
+  "paths_local": {
+    "_说明": "本地电脑路径。env.mode = local 时使用。",
+    "base_dir": "D:/BaiduSyncdisk/workspace/周报与复盘",
+    "raw_reports_dir": "D:/BaiduSyncdisk/workspace/周报与复盘/原始周报",
+    "summary_dir": "D:/BaiduSyncdisk/workspace/周报与复盘/业务汇总",
+    "diff_rules_file": "D:/BaiduSyncdisk/workspace/项目管理/易云簿和财云差异化说明.md",
+    "_note": "本地环境不支持 Nginx 部署预览，跳过 Step 7"
+  },
+
+  "paths_server": {
+    "_说明": "阿里云服务器路径。env.mode = server 时使用。需通过 SSH 连接操作。",
+    "ssh_host": "请替换为阿里云服务器 IP",
+    "ssh_user": "root",
+    "ssh_identity": "~/.ssh/id_rsa_workbuddy",
     "base_dir": "/root/workspace-openclaw/workspace/周报与复盘",
     "raw_reports_dir": "/root/workspace-openclaw/workspace/周报与复盘/原始周报",
     "summary_dir": "/root/workspace-openclaw/workspace/周报与复盘/业务汇总",
